@@ -1,3 +1,5 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -784,9 +786,92 @@ class Solution {
         return answer;
     }
 
-    //
-    public int[] solution_35(String today, String[] terms, String[] privacies) {
-        int[] answer = {};
+    // 2023 KAKAO 개인정보 수집 유효기간
+    public List<Integer> solution_37(String today, String[] terms, String[] privacies) {
+        List<Integer> answer = new ArrayList<>();
+        Map<String, Integer> map = new HashMap<>();
+        String[] tmpPrivacies = new String[2];
+        String[] tmpTerms;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        LocalDate todayDate = LocalDate.parse(today, formatter);
+
+        for (int i = 0; i < terms.length; i++) {
+            tmpTerms = terms[i].split(" ");
+            map.put(tmpTerms[0], Integer.parseInt(tmpTerms[1]));
+        }
+        for (int i = 0; i < privacies.length; i++) {
+            tmpPrivacies[0] = privacies[i].substring(0,10);
+            tmpPrivacies[1] = privacies[i].substring(11,12);
+            LocalDate compareDate = LocalDate.parse(tmpPrivacies[0], formatter);
+
+            int compare = todayDate.compareTo(compareDate.plusMonths(map.get(tmpPrivacies[1])));
+            if(compare>=0){
+                answer.add(i+1);
+            }
+            Collections.sort(answer);
+        }
         return answer;
+    }
+    // 최솟값과 최댓값
+    public String solution_38(String s) {
+        String answer = "";
+        String[] tmpStr = s.split(" ");
+        int max = Arrays.stream(tmpStr).mapToInt(Integer::parseInt).max().orElseThrow();
+        int min = Arrays.stream(tmpStr).mapToInt(Integer::parseInt).min().orElseThrow();
+        answer = min + " " + max;
+        return answer;
+    }
+
+    // JadenCase 문자열 만들기
+    public String solution_39(String s) {
+//        return Arrays.stream(s.split(" ", -1))  // 연속된 공백도 유지
+//                .map(word -> {
+//                    if (word.length() > 0) {
+//                        // 첫 글자는 대문자, 나머지는 소문자로 변환
+//                        return Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase();
+//                    } else {
+//                        return word;  // 공백은 그대로 유지
+//                    }
+//                })
+//                .collect(Collectors.joining(" "));  // 변환된 단어들을 공백으로 연결
+
+        String[] word = s.split(" ", -1);
+        return Arrays.stream(word)
+                .map( str -> {
+                    if(str.length() > 0){
+                        return Character.toUpperCase(str.charAt(0)) + str.substring(1).toLowerCase();
+                    } else{
+                        return str;
+                    }
+                }).collect(Collectors.joining(" "));
+    }
+
+    // 피보나치 수 ( 재귀 )
+    public int solution_40(int n) {
+        int answer = Fibonaci(n);
+        return answer%1234567;
+    }
+    public int Fibonaci(int num) {
+        if(num==0||num==1){
+            return num;
+        }
+        return Fibonaci(num-1) + Fibonaci(num-2);
+    }
+
+    // 피보나치 수 ( DP )
+    int[] numbers = new int[100000];
+
+    public int solution_41(int n) {
+        return Fibonaci2(n)%1234567;
+    }
+    public int Fibonaci2(int n){
+        if (numbers[n] == 0) {
+            if (n == 1 || n == 2) {
+                numbers[n] = 1;
+            } else {
+                numbers[n] = Fibonaci2(n - 1) + Fibonaci(n - 2);
+            }
+        }
+        return numbers[n];
     }
 }
