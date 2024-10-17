@@ -874,4 +874,68 @@ class Solution {
         }
         return numbers[n];
     }
+
+    // 2017 팁스타운 짝지어 제거하기
+    public int solution_42(String s){
+        Stack<Character> stack = new Stack<>();
+        for (char c : s.toCharArray()){
+            if(!stack.isEmpty()){
+                if(c==stack.peek()){
+                    stack.pop();
+                } else {
+                    stack.push(c);
+                }
+            } else{
+                stack.push(c);
+            }
+        }
+        int answer = stack.isEmpty() ? 1 : 0;
+        return answer;
+    }
+
+    // 카펫
+    public int[] solution_43(int brown, int yellow) {
+        int[] answer = {};
+        return answer;
+    }
+
+    // 점프와 순간 이동
+    public int solution_44(int n) {
+        int ans = 0;
+        while(n>=0){
+            if(n%2==0){
+                n/=2;
+            } else{
+                n-=1;
+                ans+=1;
+            }
+        }
+
+        return ans;
+    }
+
+    // Summer/Winter Coding(~2018) 영어 끝말잇기
+    public int[] solution_45(int n, String[] words) {
+        int[] answer = {0,0};
+        HashMap<Integer, String> map = new HashMap<>(n);
+        for (int i = 0; i < n; i++) {
+            map.put(i, "");
+        }
+        int count=0;
+        map.put(0, words[0]);
+        for (int i = 1; i < words.length; i++) {
+            if(i%n==0){
+                count++;
+                System.out.println(count);
+            }
+            if(words[i].charAt(0)==words[i-1].charAt(words[i-1].length()-1)){
+                map.put(n%i, words[i]);
+            } else{
+                answer[0]=i%n+1;
+                answer[1]=count;
+                break;
+            }
+        }
+        return answer;
+    }
 }

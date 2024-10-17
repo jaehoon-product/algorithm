@@ -10,6 +10,7 @@ public class Main {
         String today = "2022.05.19";
         String[] terms = new String[] {"A 6", "B 12", "C 3"};
         String[] privacies = new String[] {"2021.05.02 A", "2021.07.01 B", "2022.02.19 C", "2022.02.20 C" };
-        System.out.println("answer " + s.solution_40(5));
+        String[] words = new String[]{"tank", "kick", "know", "wheel", "land", "dream", "mother", "robot", "tank"};
+        System.out.println("answer " + s.solution_45(3,words));
     }
 }
