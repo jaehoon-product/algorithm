@@ -1,7 +1,11 @@
+import com.sun.nio.sctp.AbstractNotificationHandler;
+
+import java.awt.font.MultipleMaster;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 class Solution {
     // [PCCP 기출문제] 1번 / 동영상 재생기
@@ -917,24 +921,193 @@ class Solution {
     // Summer/Winter Coding(~2018) 영어 끝말잇기
     public int[] solution_45(int n, String[] words) {
         int[] answer = {0,0};
-        HashMap<Integer, String> map = new HashMap<>(n);
-        for (int i = 0; i < n; i++) {
-            map.put(i, "");
+        List<List<String>> map = new ArrayList<>();
+        Map<Integer, List<String>> multiValueMap = new HashMap<>();
+        Set<String> set = new HashSet<>();
+        for (int i = 0; i < words.length; i++) {
+            addValue(multiValueMap, i%n, words[i]);
         }
-        int count=0;
-        map.put(0, words[0]);
-        for (int i = 1; i < words.length; i++) {
-            if(i%n==0){
-                count++;
-                System.out.println(count);
+        for (int i = 0; i < n; i++) {
+            map.add(multiValueMap.get(i));
+        }
+        System.out.println(map);
+        for (int i = 0; i < map.size(); i++) {
+            for (int j = 0; j < map.get(i).size(); j++) {
+                if(!set.add(map.get(i).get(j))){
+                    answer[0]=j+1;
+                    answer[1]=i+1;
+                    return answer;
+                }
             }
-            if(words[i].charAt(0)==words[i-1].charAt(words[i-1].length()-1)){
-                map.put(n%i, words[i]);
-            } else{
-                answer[0]=i%n+1;
-                answer[1]=count;
-                break;
+        }
+        for (int i = 0; i < n; i++) {
+            for (int j = 1; j < n; j++) {
+                if(i==0&&j==0)continue;
+                String before = map.get(j-1).get(i);
+                String current = map.get(j).get(i);
+                System.out.println(before + " " + current + i + " " + j);
+                if(before.charAt(before.length()-1)!=current.charAt(0)){
+                    answer[0]=i;
+                    answer[1]=j;
+                    break;
+                }
             }
+        }
+
+        return answer;
+    }
+    public static <K, V> void addValue(Map<K, List<V>> map, K key, V value) {
+        // 기존 값 리스트를 가져오거나 새로 생성
+        List<V> values = map.computeIfAbsent(key, k -> new ArrayList<>());
+        // 값 추가
+        values.add(value);
+    }
+
+    public int solution_46(int n, int a, int b)
+    {
+        int answer = 1;
+        int[] nums = new int[n+1];
+        nums[a]=1;
+        nums[b]=1;
+        for (int i = 0; i < Math.sqrt(n); i++) {
+            double tmpA = a;
+            double tmpB = b;
+            nums[a]=0;
+            nums[b]=0;
+            a=(int) Math.ceil(tmpA/2);
+            b=(int) Math.ceil(tmpB/2);
+            nums[a]=1;
+            nums[b]=1;
+            System.out.println(Arrays.toString(nums));
+            for (int j = 1; j < n+1; j+=2) {
+                if(nums[j]==1 && nums[j+1]==1){
+                    answer = i+2;
+                    break;
+                }
+            }
+        }
+        return answer;
+    }
+
+    public int solution_47(String s) {
+        int answer = 0;
+        if(checkGwalho(s)){
+            answer++;
+        }
+        for (int i = 1; i < s.length(); i++) {
+            char[] tmpChars = s.toCharArray();
+            char tmp = tmpChars[0];
+            for (int j = 0; j < tmpChars.length-1; j++) {
+                tmpChars[j] = tmpChars[j+1];
+            }
+            tmpChars[tmpChars.length-1] = tmp;
+            s = String.valueOf(tmpChars);
+            System.out.println(s);
+            if(checkGwalho(s)){
+                answer++;
+            }
+        }
+        return answer;
+    }
+
+    public boolean checkGwalho(String s){
+        char[] chars = s.toCharArray();
+        Stack<Character> stack = new Stack<>();
+        for (char c : chars){
+            if(c=='(' || c=='{' || c=='['){
+                stack.push(c);
+            }
+            if(c==')'){
+                if(stack.isEmpty()){
+                    return false;
+                }
+                if(stack.peek()=='('){
+                    stack.pop();
+                }
+            }
+            if(c=='}'){
+                if(stack.isEmpty()){
+                    return false;
+                }
+                if(stack.peek()=='{'){
+                    stack.pop();
+                }
+            }
+            if(c==']'){
+                if(stack.isEmpty()){
+                    return false;
+                }
+                if(stack.peek()=='['){
+                    stack.pop();
+                }
+            }
+        }
+        if(stack.isEmpty()){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public List<Integer> solution_48(int n, long left, long right) {
+        List<Integer> answer = new ArrayList<>();
+        for (long i = left; i < right+1; i++) {
+            answer.add((int) (Math.max(i/n, i%n)+1));
+        }
+        return answer;
+    }
+    public int solution_49(int cacheSize, String[] cities) {
+        int answer=0;
+        Deque<String> cache = new ArrayDeque<>();
+        // early-return
+        if(cacheSize==0){
+            answer=cities.length*5;
+            return answer;
+        }
+        for (int i = 0; i < cities.length; i++) {
+            // cache hit
+            if(cache.contains(cities[i].toLowerCase())){
+                answer++;
+                cache.remove(cities[i].toLowerCase());
+                cache.push(cities[i].toLowerCase());
+            } else{ // cache miss
+                if(cache.size()==cacheSize){
+                    answer+=5;
+                    cache.removeLast();
+                    cache.push(cities[i].toLowerCase());
+                } else{
+                    answer+=5;
+                    cache.push(cities[i].toLowerCase());
+                }
+            }
+        }
+        return answer;
+    }
+
+    public int[] solution_50(String[] wallpaper){
+        int lux=Integer.MAX_VALUE, luy=Integer.MAX_VALUE, rdx=Integer.MIN_VALUE, rdy=Integer.MIN_VALUE;
+        for (int i = 0; i < wallpaper.length; i++) {
+            for (int j = 0; j < wallpaper[i].length(); j++) {
+                if(wallpaper[i].charAt(j)=='#'){
+                    luy = Math.min(luy,j);
+                    lux = Math.min(lux,i);
+                    rdx = Math.max(rdx,i+1);
+                    rdy = Math.max(rdy,j+1);
+                }
+            }
+        }
+        return new int[] {lux, luy, rdx, rdy};
+    }
+
+    public List<Integer> solution_51(int k, int[] score) {
+        PriorityQueue<Integer> priorityQueue = new PriorityQueue<>();
+        List<Integer> answer = new ArrayList<>();
+        for (int i = 0; i < score.length; i++) {
+            priorityQueue.offer(score[i]);
+            if(priorityQueue.size()>k){
+                priorityQueue.poll();
+            }
+            answer.add(priorityQueue.peek());
         }
         return answer;
     }
